@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+
+{% block body %}
+{% set total = total_count %}
+{% set done = completed_count %}
+<div class="content" data-total="{{ total }}" data-done="{{ done }}">
+    <header class="hero">
+        <div class="hero-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <h1>Task Master</h1>
+        {% if total > 0 %}
+        <p class="hero-sub">{{ done }} of {{ total }} tasks completed</p>
+        <div class="progress-track">
+            <div class="progress-fill" style="width: {{ (done / total * 100)|round(0, 'floor')|int }}%"></div>
+        </div>
+        {% else %}
+        <p class="hero-sub">Nothing on your plate yet</p>
+        {% endif %}
+    </header>
+
+    {% if tasks|length < 1 %}
+    <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M9 3v2a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V3" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        {% if total > 0 %}
+        <h4>All caught up!</h4>
+        <p>Nice work, you've completed everything</p>
+        {% else %}
+        <h4>There are no tasks</h4>
+        <p>Create one below to get started</p>
+        {% endif %}
+    </div>
+    {% else %}
+    <ul class="task-list">
+        {% for task in tasks %}
+            <li class="task-card {% if task.completed %}is-complete{% endif %}" style="animation-delay: {{ loop.index0 * 40 }}ms">
+                <a href="/complete/{{ task.id }}" class="task-check" aria-label="Toggle complete">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+                <div class="task-body">
+                    <p class="task-content">{{ task.content }}</p>
+                    <span class="task-date">{{ task.date_created.strftime('%b %-d, %Y') }}</span>
+                </div>
+                <div class="task-actions">
+                    <a href="/update/{{ task.id }}" class="icon-btn" aria-label="Edit task">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                    <a href="/delete/{{ task.id }}" class="icon-btn icon-btn-danger" aria-label="Delete task">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 6h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <form action="/" method="POST" class="add-form">
+        <input type="text" name="content" id="content" placeholder="What needs to be done?" autocomplete="off" required>
+        <button type="submit">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+            <span>Add Task</span>
+        </button>
+    </form>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+{% endblock %}
